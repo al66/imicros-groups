@@ -16,6 +16,10 @@
     "ACL",
     "Authorization"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/al66/imicros-groups.git"
+  },
   "dependencies": {
     "neo4j-driver": "^1.7.2",
     "object-mapper": "^5.0.0",
