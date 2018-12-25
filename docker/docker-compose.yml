@@ -1,0 +1,29 @@
+version: '2'
+services:
+
+    publisher:
+        build:
+            context: .
+        image: groups
+        # env_file: docker-compose.env
+        environment:
+            SERVICES: groups
+        external_links:
+        # depends on the names of your running docker services for nats and neo4j
+        - nats
+        - neo4j
+        # depends on the names of the networks of your running docker services
+        networks:
+        - default
+        - redis_default
+        - nats_default
+        - neo4j_default
+
+networks:
+    redis_default:
+        external: true
+    nats_default:
+        external: true
+    neo4j_default:
+        external: true
+    

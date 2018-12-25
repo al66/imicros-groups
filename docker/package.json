@@ -1,0 +1,18 @@
+{
+  "name": "imicros-groups",
+  "version": "1.0.0",
+  "description": "Docker build",
+  "scripts": {
+    "start": "moleculer-runner services"
+  },
+  "author": "Andreas.Leinen@imicros.de",
+  "dependencies": {
+    "ioredis": "^3.1.0",
+    "nats": "^0.8.10",
+    "moleculer": "0.12.6",
+    "imicros-groups": "*"
+  },
+  "engines": {
+    "node": ">= 8.x.x"
+  }
+}
