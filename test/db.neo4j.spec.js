@@ -53,19 +53,24 @@ describe("Test db.neo4j", () => {
         let res = await broker.call("test.db.run","CREATE (ee:Person { name: 'Horst', from: 'Germany' })");
         expect(res).toBeDefined();
         res = await broker.call("test.db.run","MATCH (ee:Person) WHERE ee.name = 'Horst' RETURN ee;");
-        //console.log(JSON.stringify(res));
         expect(res).toBeDefined();
         expect(res[0].ee).toBeDefined();
         expect(res[0].ee.properties).toEqual(expect.objectContaining({ name: "Horst", from: "Germany" }));
     });
     
-    /*
-    it("sample doc should be get again", async () => {
-        expect.assertions(2);
-        let res = await broker.call("test.db.get",{ _id: doc._id });
-        expect(res).toBeDefined();
-        expect(res).toEqual(expect.objectContaining(doc));
+    it("should log syntax error", async () => {
+        expect.assertions(1);
+        let res = await broker.call("test.db.run","WRONG STATEMENT");
+        expect(res).not.toBeDefined();
     });
-    */
+    
+    it("should create service with defaults", async () => {
+        let withDefaults = {
+            name: "test.db.defaults",
+            mixins: [dbMixin]
+        };
+        let defaults = await broker.createService(withDefaults);
+        expect(defaults).toBeDefined();
+    });
     
 });

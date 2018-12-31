@@ -757,7 +757,7 @@ describe("Test group service", () => {
     
     describe("Test group access", () => {
 
-        let opts, first, second, third;
+        let opts, first, second, third, resId;
         beforeEach(() => {
             opts = { meta: { user: { id: `1-${timestamp}`, email: `1-${timestamp}@host.com` } } };
         });
@@ -797,11 +797,91 @@ describe("Test group service", () => {
             });
         });
 
+        it("it should add a new ressource", () => {
+            let params = {
+                groupId: first,
+                service: `service.${timestamp}`,
+                getAction: "get"
+            };
+            return broker.call("groups.addRessource", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res[0].resId).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ groupId: first, service: params.service }));
+                resId = res[0].resId;
+            });
+        });
+        
+        it("it should list grant owner", () => {
+            let params = {
+                resId: resId,
+                service: `service.${timestamp}`,
+                action: "any"
+            };
+            return broker.call("groups.isAuthorized", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res[0].owner).toBeDefined();
+                expect(res[0].owner).toEqual(true);
+            });
+        });
+        
+        it("it should return empty array (not authorized)", () => {
+            opts = { meta: { user: { id: `2-${timestamp}`, email: `2-${timestamp}@host.com` } } };
+            let params = {
+                resId: resId,
+                service: `service.${timestamp}`,
+                action: "get"
+            };
+            return broker.call("groups.isAuthorized", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual([]);
+            });
+        });
+        
+
+        it("it should invite user as member", () => {
+            let params = {
+                id: first, 
+                email: `2-${timestamp}@host.com`,
+                role: "member"
+            };
+            return broker.call("groups.invite", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res[0].invited).toBeDefined();
+                expect(res[0].invited).toEqual(`2-${timestamp}@host.com`);
+            });
+        });
+
+        it("it should add user as member", () => {
+            opts = { meta: { user: { id: `2-${timestamp}`, email: `2-${timestamp}@host.com` } } };
+            let params = {
+                id: first
+            };
+            return broker.call("groups.join", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ id: first, role: "member" }));
+            });
+        });
+
+        it("it should list grant owner", () => {
+            opts = { meta: { user: { id: `2-${timestamp}`, email: `2-${timestamp}@host.com` } } };
+            let params = {
+                resId: resId,
+                service: `service.${timestamp}`,
+                action: "any"
+            };
+            return broker.call("groups.isAuthorized", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res[0].owner).toBeDefined();
+                expect(res[0].owner).toEqual(true);
+            });
+        });
+        
         it("it should add access grant for a group ", () => {
             let params = {
                 byGroupId: first,
-                forGroupId: second,
-                ruleset: "XXX-YYY-ZZZZ"
+                forGroupId: third,
+                service: `service.${timestamp}`,
+                action: "update"
             };
             return broker.call("groups.addGrant", params, opts).then(res => {
                 expect(res).toBeDefined();
@@ -809,6 +889,46 @@ describe("Test group service", () => {
             });
         });        
 
+        it("it should list grant for update", () => {
+            opts = { meta: { user: { id: `3-${timestamp}`, email: `3-${timestamp}@host.com` } } };
+            let params = {
+                resId: resId,
+                service: `service.${timestamp}`,
+                action: "update"
+            };
+            return broker.call("groups.isAuthorized", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ service: `service.${timestamp}`, action: "update" }));
+            });
+        });
+        
+        it("it should remove access grant for a group ", () => {
+            let params = {
+                byGroupId: first,
+                forGroupId: third,
+                service: `service.${timestamp}`,
+                action: "update"
+            };
+            return broker.call("groups.removeGrant", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({removed: third}));
+            });
+        });        
+
+        it("it should return empty array (not authorized)", () => {
+            opts = { meta: { user: { id: `3-${timestamp}`, email: `3-${timestamp}@host.com` } } };
+            let params = {
+                resId: resId,
+                service: `service.${timestamp}`,
+                action: "update"
+            };
+            return broker.call("groups.isAuthorized", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual([]);
+            });
+        });
+        
+        /*
         it("it should add access grant for a group ", () => {
             let params = {
                 byGroupId: first,
@@ -821,16 +941,6 @@ describe("Test group service", () => {
             });
         });        
 
-        it("it should deliver all groups the user has access to", () => {
-            opts = { meta: { user: { id: `3-${timestamp}`, email: `3-${timestamp}@host.com` } } };
-            let params = {} ;
-            return broker.call("groups.access", params, opts).then(res => {
-                expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ id: third, relation: "MEMBER_OF"}));
-                expect(res).toContainEqual(expect.objectContaining({ id: first, relation: "GRANT", ruleset: "XXX-YYY-ZZZZ"} ));
-            });
-        });
-
         it("it should remove access grant for a group ", () => {
             let params = {
                 byGroupId: first,
@@ -841,16 +951,7 @@ describe("Test group service", () => {
                 expect(res).toContainEqual(expect.objectContaining({removed: third}));
             });
         });    
-        
-        it("it should deliver all groups the user has access to", () => {
-            opts = { meta: { user: { id: `3-${timestamp}`, email: `3-${timestamp}@host.com` } } };
-            let params = {} ;
-            return broker.call("groups.access", params, opts).then(res => {
-                expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ id: third, relation: "MEMBER_OF"}));
-                expect(res).not.toContainEqual(expect.objectContaining({ id: first, relation: "GRANT", ruleset: "XXX-YYY-ZZZZ"}));
-            });
-        });
+        */
 
     });
     
