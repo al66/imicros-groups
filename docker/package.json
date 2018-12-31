@@ -1,16 +1,16 @@
 {
   "name": "imicros-groups",
   "version": "1.0.0",
+  "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
+  "license": "MIT",
   "description": "Docker build",
   "scripts": {
     "start": "moleculer-runner services"
   },
-  "author": "Andreas.Leinen@imicros.de",
   "dependencies": {
-    "ioredis": "^3.1.0",
+    "imicros-groups": "*",
     "nats": "^0.8.10",
-    "moleculer": "0.12.6",
-    "imicros-groups": "*"
+    "moleculer": "^0.13.5"
   },
   "engines": {
     "node": ">= 8.x.x"

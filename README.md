@@ -22,7 +22,7 @@ broker = new ServiceBroker({
 });
 service = broker.createService(Groups, Object.assign({ 
     settings: { 
-        uri: "bolt://localhost:7474"
+        uri: "bolt://neo4j_groups:7474"
     } 
 }));
 broker.start();
@@ -49,9 +49,9 @@ broker.start();
 - join { id (group) } => { id (group), role }
 - alias { id (group), alias } => { id (group), name (group), alias }
 - leave { id (group) } => { id (group), role, email }
-- addGrant { byGroupId, forGroupId, ruleset } => { byGroupId, forGroupId, ruleset }
-- removeGrant { byGroupId, forGroupId } => { removed }
-- access {} => { id (group), relation (MEMBER_OF|GRANT), ruleset }
+- addGrant { byGroupId, forGroupId, service, action, forRessourceId, forFolderId } => { byGroupId, forGroupId, service, action }
+- removeGrant { byGroupId, forGroupId, service, action, forRessourceId, forFolderId } => { removed }
+- isAuthorized { resId, service, action } => { owner (true|false), service, action } | empty array (not authorized)
 
 
 

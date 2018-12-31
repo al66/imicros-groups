@@ -1,6 +1,6 @@
 {
   "name": "imicros-groups",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer Service for Managing Usergroups",

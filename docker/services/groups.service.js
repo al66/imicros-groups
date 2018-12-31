@@ -5,17 +5,29 @@ const { Groups } = require("imicros-groups");
 module.exports = {
     name: "groups",
     mixins: [Groups],
-
-    /**
-     * Service settings
-     */
+    
+	/**
+	 * Service settings
+	 */
     settings: {
-        // to be done: db connection
+        uri: "bolt://neo4j_groups:7687",
+        user: "neo4j",
+        password: "neo4j"
     },
 
-    /**
-     * Service metadata
-     */
-    metadata: {},
 
+	/**
+	 * Service created lifecycle event handler
+	 */
+    created() {},
+
+	/**
+	 * Service started lifecycle event handler
+	 */
+    started() {},
+
+	/**
+	 * Service stopped lifecycle event handler
+	 */
+    stopped() {}
 };
