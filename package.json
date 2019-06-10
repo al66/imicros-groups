@@ -1,6 +1,6 @@
 {
   "name": "imicros-groups",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer Service for Managing Usergroups",
@@ -15,7 +15,6 @@
   "keywords": [
     "Moleculer",
     "Usergroups",
-    "ACL",
     "Authorization"
   ],
   "repository": {
@@ -23,13 +22,13 @@
     "url": "git+https://github.com/al66/imicros-groups.git"
   },
   "dependencies": {
-    "neo4j-driver": "^1.7.2",
+    "neo4j-driver": "^1.7.5",
     "object-mapper": "^5.0.0",
-    "uuidv4": "^2.0.0"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "coveralls": "^3.0.2",
-    "jest": "^23.6.0",
-    "moleculer": "^0.13.5"
+    "coveralls": "^3.0.4",
+    "jest": "^24.8.0",
+    "moleculer": "^0.13.9"
   }
 }
