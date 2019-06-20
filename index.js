@@ -5,6 +5,5 @@
 
 module.exports = {
     Groups: require("./lib/groups"),
-    Authorization: require("./lib/authorization"),
     Errors: require("./lib/util/errors")    
 };
