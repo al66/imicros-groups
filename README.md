@@ -40,19 +40,6 @@ service = broker.createService(Groups, Object.assign({
 broker.start();
 
 ```
-## Usage authorization mixin
-### Add a new ressource
-```js
-// call method of autorization mixin (user must be member of the group to add new ressources)
-let uid = await this.registerRessource({ resId: 'Optional, external uid', groupId: 'id of the owner group'});
-
-```
-### Check authorization
-```js
-// call method of autorization mixin
-await this.isAutorized({ resId: 'id of ressource', action: 'name of the called action or a specific command like read,write,update'});
-
-```
 ## Actions (groups service)
 - add { name } => { id (new group), name (new group), userId, role }  
 - get { id } => { id (group), name (group), relation (MEMBER_OF), role  }  
@@ -70,10 +57,6 @@ await this.isAutorized({ resId: 'id of ressource', action: 'name of the called a
 - join { id (group) } => { id (group), role }
 - alias { id (group), alias } => { id (group), name (group), alias }
 - leave { id (group) } => { id (group), role, email }
-- addGrant { byGroupId, forGroupId, service, action, forRessourceId, forFolderId } => { byGroupId, forGroupId, service, action }
-- removeGrant { byGroupId, forGroupId, service, action, forRessourceId, forFolderId } => { removed }
-- isAuthorized { resId, service, action } => { owner (true|false), service, action } | empty array (not authorized)
-
 
 ## Docker
 ### Neo4j - example docker-compose file

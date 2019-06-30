@@ -17,29 +17,57 @@ afterAll( async () => {
 describe("Test group service", () => {
 
     let broker, service;
-    beforeAll( async () => {
-        broker = new ServiceBroker({
-            logger: console
-        });
-        service = broker.createService(Groups, Object.assign({ 
-            settings: { 
-                uri: process.env.URI || "bolt://localhost:7687",
-                user: "neo4j",
-                password: "neo4j"
-            } 
-        }));
-        return broker.start();
-    });
+    beforeAll(() => {});
 
-    afterAll(async (done) => {
-        await broker.stop().then(() => done());
-    });
+    afterAll(() => {});
     
     describe("Test create service", () => {
 
-        it("it should be created", () => {
+        let initialGroupId;
+        
+        it("it should be created", async () => {
+            broker = new ServiceBroker({
+                logger: console
+            });
+            service = broker.createService(Groups, Object.assign({ 
+                settings: { 
+                    uri: process.env.URI || "bolt://localhost:7687",
+                    user: "neo4j",
+                    password: "neo4j",
+                    initial : [{
+                        name: "imciros administration",
+                        member: `admin-${timestamp}@host.com`
+                    }]
+                } 
+            }));
+            await broker.start();
             expect(service).toBeDefined();
         });
+        
+        it("it should return initial group", () => {
+            let opts = { meta: { user: { id: `admin-${timestamp}`, email: `admin-${timestamp}@host.com` } } };
+            let params = {
+                limit: 100
+            };
+            return broker.call("groups.list", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(Array.isArray(res)).toEqual(true);
+                expect(res.length).toEqual(1);
+                expect(res[0]).toEqual(expect.objectContaining({ name: "imciros administration" }));
+                initialGroupId = res[0].id;
+            });
+        });
+
+        it("it should add user as admin", () => {
+            let opts = { meta: { user: { id: `admin-${timestamp}`, email: `admin-${timestamp}@host.com` } } };
+            let params = {
+                id: initialGroupId
+            };
+            return broker.call("groups.join", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ id: initialGroupId, role: "admin" }));
+            });
+        });        
 
     });
 
@@ -753,5 +781,13 @@ describe("Test group service", () => {
     
         
     });
+
+    describe("Test stop broker", () => {
+        it("should stop the broker", async () => {
+            expect.assertions(1);
+            await broker.stop();
+            expect(broker).toBeDefined();
+        });
+    });    	
     
 });

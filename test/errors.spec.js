@@ -18,5 +18,4 @@ describe("Test errors without parameter", () => {
         expect(new GroupsUpdate("message") instanceof GroupsUpdate).toBe(true);
     });
     
-    
 });

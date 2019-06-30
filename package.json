@@ -22,6 +22,7 @@
     "url": "git+https://github.com/al66/imicros-groups.git"
   },
   "dependencies": {
+    "lodash": "^4.17.11",
     "neo4j-driver": "^1.7.5",
     "object-mapper": "^5.0.0",
     "uuid": "^3.3.2"
