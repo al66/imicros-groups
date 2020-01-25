@@ -95,7 +95,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toEqual([{ id: `1-${timestamp}`, role: "admin" }]);
+                expect(res).toEqual([{ email: `1-${timestamp}@host.com`, id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF" }]);
             });
         });
     
@@ -263,6 +263,16 @@ describe("Test group service", () => {
             });
         });
         
+        it("it should return all members including invited member", async () => {
+            let params = {
+                id: id
+            };
+            return broker.call("groups.members", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ email: `3-${timestamp}@host.com` }));
+            });
+        });
+
         it("it should invite user", () => {
             let params = {
                 id: id, 
@@ -509,7 +519,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ id: `4-${timestamp}`, role: "admin" }));
+                expect(res).toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com`, id: `4-${timestamp}`, role: "admin" }));
             });
         });
         
@@ -655,13 +665,13 @@ describe("Test group service", () => {
             });
         });
 
-        it("it should return all members", () => {
+        it("it should return member as invited" , () => {
             let params = {
                 id: id
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).not.toContainEqual(expect.objectContaining({ id: `4-${timestamp}`, role: "admin" }));
+                expect(res).toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com`, id: `4-${timestamp}`, role: "admin", relation: "INVITED_BY" }));
             });
         });
         
