@@ -675,6 +675,27 @@ describe("Test group service", () => {
             });
         });
         
+        it("it should remove invited member from group", () => {
+            let params = {
+                groupId: id,
+                userId: `4-${timestamp}`
+            };
+            return broker.call("groups.remove", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com`, groupId: id }));
+            });
+        });
+
+        it("it should return all members w/o removed invitation", () => {
+            let params = {
+                id: id
+            };
+            return broker.call("groups.members", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).not.toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com` }));
+            });
+        });
+        
         it("it should remove member from group", () => {
             let params = {
                 groupId: id,
