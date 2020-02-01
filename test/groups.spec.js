@@ -95,7 +95,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toEqual([{ email: `1-${timestamp}@host.com`, id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF" }]);
+                expect(res).toContainEqual(expect.objectContaining({ email: `1-${timestamp}@host.com`, id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF" }));
             });
         });
     
@@ -744,6 +744,72 @@ describe("Test group service", () => {
         });        
 
     });
+    
+    describe("Test ttl", () => {
+
+        let opts, id;
+        beforeEach(() => {
+            opts = { meta: { user: { id: `1-${timestamp}`, email: `1-${timestamp}@host.com` } } };
+        });
+
+        it("it should return id for created entry", () => {
+            let params = {
+                name: "group for ttl test"
+            };
+            return broker.call("groups.add", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res[0]).toEqual(expect.objectContaining(params));
+                id = res[0].id;
+            });
+        });
+
+        it("it should leave group and set ttl", () => {
+            let params = {
+                id: id
+            };
+            let tteLow = Date.now() + ( 1000 * 60 * 60 * 24 * 13 );  // add 13 days
+            let tteHigh = Date.now() + ( 1000 * 60 * 60 * 24 * 15 );  // add 15 days
+            return broker.call("groups.leave", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ id: id, role: "admin", email: `1-${timestamp}@host.com` }));
+                expect(res[0].ttl).toBeDefined();
+                expect(res[0].ttl > tteLow && res[0].ttl < tteHigh ).toEqual(true);
+            });
+        });
+      
+        it("it should return group with ttl", () => {
+            let params = {
+                id: id
+            };
+            return broker.call("groups.get", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ id: id }));
+                expect(res[0].ttl).toBeDefined();
+            });
+        });
+
+        it("it should join as admin and delete ttl again", () => {
+            let params = {
+                id: id
+            };
+            return broker.call("groups.join", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ id: id, role: "admin" }));
+            });
+        });
+
+        it("it should return group with cleared ttl", () => {
+            let params = {
+                id: id
+            };
+            return broker.call("groups.get", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({ id: id }));
+                expect(res[0].ttl).toEqual(null);
+            });
+        });
+      
+    });
 
     describe("Test nominate and revoke", () => {
 
@@ -763,7 +829,7 @@ describe("Test group service", () => {
             });
         });
         
-        for (let t = 1; t < 5; t++ ) {
+        for (let t = 2; t < 5; t++ ) {
             it(`it should invite ${t}. user`, () => {
                 let params = {
                     id: group, 
@@ -788,28 +854,123 @@ describe("Test group service", () => {
             });
         }
         
-        it("it should nominate 1. user as admin", () => {
+        it("it should nominate second user as admin", () => {
             let params = {
                 groupId: group,
-                userId: `t1-${timestamp}`
+                userId: `t2-${timestamp}`
             };
             return broker.call("groups.nominate", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({newRole: "admin"}));
+                expect(res).toContainEqual(expect.objectContaining({request: "nominate", requester: opts.meta.user.id }));
             });
         });
     
-        it("it should revoke 1. user as admin", () => {
+        it("it should accept second user as admin", () => {
+            opts.meta.user = { id: `t2-${timestamp}`, email: `2-${timestamp}@host.com` };
             let params = {
                 groupId: group,
-                userId: `t1-${timestamp}`
+                request: "nominate"
+            };
+            return broker.call("groups.accept", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({role: "admin", request: null, requester: null }));
+            });
+        });
+    
+        it("it should nominate third user as admin", () => {
+            let params = {
+                groupId: group,
+                userId: `t3-${timestamp}`
+            };
+            return broker.call("groups.nominate", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({request: "nominate", requester: opts.meta.user.id }));
+            });
+        });
+    
+        it("it should decline third user as admin", () => {
+            opts.meta.user = { id: `t3-${timestamp}`, email: `3-${timestamp}@host.com` };
+            let params = {
+                groupId: group,
+                request: "nominate"
+            };
+            return broker.call("groups.decline", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({role: "member", request: null, requester: null }));
+            });
+        });
+    
+        it("it should request to revoke second user as admin", () => {
+            let params = {
+                groupId: group,
+                userId: `t2-${timestamp}`
             };
             return broker.call("groups.revoke", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({newRole: "member"}));
+                expect(res).toContainEqual(expect.objectContaining({request: "revoke", requester: opts.meta.user.id }));
+                expect(res[0].tte).toBeDefined();
+            });
+        });
+
+        it("it should accept revoke request by second user", () => {
+            opts.meta.user = { id: `t2-${timestamp}`, email: `2-${timestamp}@host.com` };
+            let params = {
+                groupId: group,
+                request: "revoke"
+            };
+            return broker.call("groups.accept", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({role: "member", request: null, requester: null, tte: null }));
+            });
+        });
+
+        it("it should nominate third user as admin", () => {
+            let params = {
+                groupId: group,
+                userId: `t3-${timestamp}`
+            };
+            return broker.call("groups.nominate", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({request: "nominate", requester: opts.meta.user.id }));
             });
         });
     
+        it("it should accept third user as admin", () => {
+            opts.meta.user = { id: `t3-${timestamp}`, email: `3-${timestamp}@host.com` };
+            let params = {
+                groupId: group,
+                request: "nominate"
+            };
+            return broker.call("groups.accept", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({role: "admin", request: null, requester: null }));
+            });
+        });
+    
+      
+        it("it should request to revoke third user as admin again", () => {
+            let params = {
+                groupId: group,
+                userId: `t3-${timestamp}`
+            };
+            return broker.call("groups.revoke", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({request: "revoke", requester: opts.meta.user.id }));
+                expect(res[0].tte).toBeDefined();
+            });
+        });
+
+        it("it should decline revoke request by third user", () => {
+            opts.meta.user = { id: `t3-${timestamp}`, email: `3-${timestamp}@host.com` };
+            let params = {
+                groupId: group,
+                request: "revoke"
+            };
+            return broker.call("groups.decline", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toContainEqual(expect.objectContaining({role: "admin", request: null, requester: null, tte: null }));
+            });
+        });
         
     });
 
