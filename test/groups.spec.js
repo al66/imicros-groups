@@ -36,7 +36,8 @@ describe("Test group service", () => {
                     password: "neo4j",
                     initial : [{
                         name: "imciros administration",
-                        member: `admin-${timestamp}@host.com`
+                        member: `admin-${timestamp}@host.com`,
+                        core: true
                     }]
                 } 
             }));
