@@ -1,1 +1,1 @@
-process.env.URI = "bolt://localhost:7474";
+process.env.URI = "bolt://localhost:7687";
