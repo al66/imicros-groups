@@ -6,7 +6,7 @@
   "description": "Moleculer Service for Managing Usergroups",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --no-cache  --silent",
+    "test": "jest --coverage --no-cache --config=travis.js --silent",
     "test-local": "jest --coverage --no-cache --config=local.js --silent",
     "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
     "test-groups": "jest test/groups.spec.js --no-cache --config=local.js",
