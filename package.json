@@ -1,13 +1,13 @@
 {
   "name": "imicros-groups",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer Service for Managing Usergroups",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --no-cache",
-    "test-local": "jest --coverage --no-cache --config=local.js",
+    "test": "jest --coverage --no-cache  --silent",
+    "test-local": "jest --coverage --no-cache --config=local.js --silent",
     "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
     "test-groups": "jest test/groups.spec.js --no-cache --config=local.js",
     "test-auth": "jest test/authorization.spec.js --no-cache --config=local.js"
@@ -22,12 +22,12 @@
     "url": "git+https://github.com/al66/imicros-groups.git"
   },
   "dependencies": {
-    "lodash": "^4.17.15",
-    "neo4j-driver": "^4.0.2",
-    "uuid": "^8.0.0"
+    "lodash": "^4.17.20",
+    "neo4j-driver": "^4.1.1",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
-    "jest": "^26.0.1",
-    "moleculer": "^0.14.6"
+    "jest": "^26.4.0",
+    "moleculer": "^0.14.9"
   }
 }

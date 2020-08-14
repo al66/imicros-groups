@@ -35,7 +35,7 @@ describe("Test group service", () => {
                     user: "neo4j",
                     password: "neo4j",
                     initial : [{
-                        name: "imciros administration",
+                        name: "imciros administration " + timestamp,
                         member: `admin-${timestamp}@host.com`,
                         core: true
                     }]
@@ -54,7 +54,7 @@ describe("Test group service", () => {
                 expect(res).toBeDefined();
                 expect(Array.isArray(res)).toEqual(true);
                 expect(res.length).toEqual(1);
-                expect(res[0]).toEqual(expect.objectContaining({ name: "imciros administration" }));
+                expect(res[0]).toEqual(expect.objectContaining({ name: "imciros administration " + timestamp }));
                 initialGroupId = res[0].id;
             });
         });
