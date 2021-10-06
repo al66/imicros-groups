@@ -5,8 +5,15 @@ const { Groups } = require("../index");
 const { GroupsNotAuthenticated,
         GroupsUpdate   
       } = require("../index").Errors;
+const crypto = require("crypto");
 
 const timestamp = Date.now();
+
+function getHash(value) {
+    return crypto.createHash("sha256")
+        .update(value)
+        .digest("hex");
+}
 
 beforeAll( async () => {
 });
@@ -96,7 +103,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `1-${timestamp}@host.com`, id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF" }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`1-${timestamp}@host.com`), id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF" }));
             });
         });
     
@@ -250,7 +257,7 @@ describe("Test group service", () => {
             return broker.call("groups.invite", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res[0].invited).toBeDefined();
-                expect(res[0].invited).toEqual(`3-${timestamp}@host.com`);
+                expect(res[0].invited).toEqual(getHash(`3-${timestamp}@host.com`));
             });
         });
 
@@ -260,7 +267,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.invitations", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `3-${timestamp}@host.com` }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`3-${timestamp}@host.com`) }));
             });
         });
         
@@ -270,7 +277,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `3-${timestamp}@host.com` }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`3-${timestamp}@host.com`) }));
             });
         });
 
@@ -282,7 +289,7 @@ describe("Test group service", () => {
             return broker.call("groups.invite", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res[0].invited).toBeDefined();
-                expect(res[0].invited).toEqual(`7-${timestamp}@host.com`);
+                expect(res[0].invited).toEqual(getHash(`7-${timestamp}@host.com`));
             });
         });
 
@@ -292,7 +299,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.invitations", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `7-${timestamp}@host.com` }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`7-${timestamp}@host.com`) }));
             });
         });
         
@@ -339,7 +346,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.invitations", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).not.toContainEqual(expect.objectContaining({ email: `7-${timestamp}@host.com` }));
+                expect(res).not.toContainEqual(expect.objectContaining({ key: getHash(`7-${timestamp}@host.com`) }));
             });
         });
         
@@ -351,7 +358,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.invite", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ invited: `3-${timestamp}@host.com`, role: "admin" }));
+                expect(res).toContainEqual(expect.objectContaining({ invited: getHash(`3-${timestamp}@host.com`), role: "admin" }));
             });
         });
         
@@ -499,7 +506,7 @@ describe("Test group service", () => {
             return broker.call("groups.invite", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res[0].invited).toBeDefined();
-                expect(res[0].invited).toEqual(`4-${timestamp}@host.com`);
+                expect(res[0].invited).toEqual(getHash(`4-${timestamp}@host.com`));
             });
         });
         
@@ -520,7 +527,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com`, id: `4-${timestamp}`, role: "admin" }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`4-${timestamp}@host.com`), id: `4-${timestamp}`, role: "admin" }));
             });
         });
         
@@ -533,7 +540,7 @@ describe("Test group service", () => {
             return broker.call("groups.invite", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res[0].invited).toBeDefined();
-                expect(res[0].invited).toEqual(`5-${timestamp}@host.com`);
+                expect(res[0].invited).toEqual(getHash(`5-${timestamp}@host.com`));
             });
         });
 
@@ -662,7 +669,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.leave", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ id: id, role: "admin", email: `4-${timestamp}@host.com` }));
+                expect(res).toContainEqual(expect.objectContaining({ id: id, role: "admin", key: getHash(`4-${timestamp}@host.com`) }));
             });
         });
 
@@ -672,7 +679,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com`, id: `4-${timestamp}`, role: "admin", relation: "INVITED_BY" }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`4-${timestamp}@host.com`), id: `4-${timestamp}`, role: "admin", relation: "INVITED_BY" }));
             });
         });
         
@@ -683,7 +690,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.remove", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com`, groupId: id }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`4-${timestamp}@host.com`), groupId: id }));
             });
         });
 
@@ -693,7 +700,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).not.toContainEqual(expect.objectContaining({ email: `4-${timestamp}@host.com` }));
+                expect(res).not.toContainEqual(expect.objectContaining({ key: getHash(`4-${timestamp}@host.com`) }));
             });
         });
         
@@ -772,7 +779,7 @@ describe("Test group service", () => {
             let tteHigh = Date.now() + ( 1000 * 60 * 60 * 24 * 15 );  // add 15 days
             return broker.call("groups.leave", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ id: id, role: "admin", email: `1-${timestamp}@host.com` }));
+                expect(res).toContainEqual(expect.objectContaining({ id: id, role: "admin", key: getHash(`1-${timestamp}@host.com`) }));
                 expect(res[0].ttl).toBeDefined();
                 expect(res[0].ttl > tteLow && res[0].ttl < tteHigh ).toEqual(true);
             });
@@ -839,7 +846,7 @@ describe("Test group service", () => {
                 return broker.call("groups.invite", params, opts).then(res => {
                     expect(res).toBeDefined();
                     expect(res[0].invited).toBeDefined();
-                    expect(res[0].invited).toEqual(`t${t}-${timestamp}@host.com`);
+                    expect(res[0].invited).toEqual(getHash(`t${t}-${timestamp}@host.com`));
                 });
             });
 
