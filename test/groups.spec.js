@@ -3,11 +3,14 @@
 const { ServiceBroker } = require("moleculer");
 const { Groups } = require("../index");
 const { GroupsNotAuthenticated,
-        GroupsUpdate   
-      } = require("../index").Errors;
+    GroupsUpdate   
+} = require("../index").Errors;
 const crypto = require("crypto");
+const { Keys } = require("./helper/keys");
 
 const timestamp = Date.now();
+
+process.env.SERVICE_TOKEN = "bVTWhK7G2ASfoMjVAiUhSLHq2P5p8135PEm+0GRvo4X=";
 
 function getHash(value) {
     return crypto.createHash("sha256")
@@ -48,6 +51,7 @@ describe("Test group service", () => {
                     }]
                 } 
             }));
+            broker.createService(Keys);
             await broker.start();
             expect(service).toBeDefined();
         });
@@ -103,7 +107,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`1-${timestamp}@host.com`), id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF" }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`1-${timestamp}@host.com`), id: `1-${timestamp}`, role: "admin", relation: "MEMBER_OF", email: `1-${timestamp}@host.com` }));
             });
         });
     
@@ -277,7 +281,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`3-${timestamp}@host.com`) }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`3-${timestamp}@host.com`), email: `3-${timestamp}@host.com` }));
             });
         });
 
@@ -679,7 +683,7 @@ describe("Test group service", () => {
             };
             return broker.call("groups.members", params, opts).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`4-${timestamp}@host.com`), id: `4-${timestamp}`, role: "admin", relation: "INVITED_BY" }));
+                expect(res).toContainEqual(expect.objectContaining({ key: getHash(`4-${timestamp}@host.com`), id: `4-${timestamp}`, role: "admin", relation: "INVITED_BY", email: `4-${timestamp}@host.com` }));
             });
         });
         
@@ -740,7 +744,7 @@ describe("Test group service", () => {
         });        
         
         
-        it("it should return empty array (group doesn not exist)", async () => {
+        it("it should return empty array (group does not exist)", async () => {
             opts = { meta: { user: { id: `4-${timestamp}`, email: `4-${timestamp}@host.com` } } };
             let params = {
                 id: id.replace(/...$/,"999")
