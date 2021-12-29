@@ -1,6 +1,6 @@
 {
   "name": "imicros-groups",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer Service for Managing Usergroups",
@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "neo4j-driver": "^4.3.3",
+    "neo4j-driver": "^4.4.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "jest": "^27.2.4",
-    "moleculer": "^0.14.17"
+    "jest": "^27.4.5",
+    "moleculer": "^0.14.18"
   }
 }

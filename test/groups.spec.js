@@ -6,11 +6,15 @@ const { GroupsNotAuthenticated,
     GroupsUpdate   
 } = require("../index").Errors;
 const crypto = require("crypto");
+const { v4: uuid } = require("uuid");
 const { Keys } = require("./helper/keys");
 
 const timestamp = Date.now();
 
 process.env.SERVICE_TOKEN = "bVTWhK7G2ASfoMjVAiUhSLHq2P5p8135PEm+0GRvo4X=";
+process.env.ADMIN_GROUP_ID = uuid();
+process.env.ADMIN_GROUP_NAME = "imciros administration " + timestamp;
+process.env.ADMIN_GROUP_MEMBER = `admin-${timestamp}@host.com`;
 
 function getHash(value) {
     return crypto.createHash("sha256")
@@ -43,12 +47,7 @@ describe("Test group service", () => {
                 settings: { 
                     uri: process.env.URI || "bolt://localhost:7687",
                     user: "neo4j",
-                    password: "neo4j",
-                    initial : [{
-                        name: "imciros administration " + timestamp,
-                        member: `admin-${timestamp}@host.com`,
-                        core: true
-                    }]
+                    password: "neo4j"
                 } 
             }));
             broker.createService(Keys);
